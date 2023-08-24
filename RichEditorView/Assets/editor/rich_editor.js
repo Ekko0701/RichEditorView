@@ -15,9 +15,13 @@
  */
  "use strict";
 
-const RE = {};
+var RE = {};
 
+window.onload = function() {
+    RE.callback("ready");
+};
 RE.editor = document.getElementById('editor');
+
 
 // Not universally supported, but seems to work in iOS 7 and 8
 document.addEventListener("selectionchange", function() {
@@ -74,7 +78,6 @@ RE.runCallbackQueue = function() {
 
     setTimeout(function() {
         window.location.href = "re-callback://";
-        //window.webkit.messageHandlers.iOS_Native_FlushMessageQueue.postMessage("re-callback://")
     }, 0);
 };
 
@@ -119,7 +122,7 @@ RE.setPlaceholderText = function(text) {
 };
 
 RE.updatePlaceholder = function() {
-    if (RE.editor.innerHTML.indexOf('img') !== -1 || RE.editor.innerHTML.length > 0) {
+    if (RE.editor.innerHTML.indexOf('img') !== -1 || (RE.editor.textContent.length > 0 && RE.editor.innerHTML.length > 0)) {
         RE.editor.classList.remove("placeholder");
     } else {
         RE.editor.classList.add("placeholder");
@@ -151,7 +154,8 @@ RE.redo = function() {
 };
 
 RE.setBold = function() {
-    document.execCommand('bold', false, null);
+    
+    document.execCommand('bold', false, 'p');
 };
 
 RE.setItalic = function() {
@@ -232,9 +236,12 @@ RE.insertImage = function(url, alt) {
     var img = document.createElement('img');
     img.setAttribute("src", url);
     img.setAttribute("alt", alt);
+    img.setAttribute("style", "max-width: 90%; height: auto; margin-left: 5%;");
     img.onload = RE.updateHeight;
 
-    RE.insertHTML(img.outerHTML);
+//    RE.insertHTML(img.outerHTML);
+    RE.insertHTML(img.outerHTML + "<div><br/></div>");
+//    RE.insertHTML(img.outerHTML + "<div><br /></div>");
     RE.callback("input");
 };
 
@@ -404,7 +411,7 @@ RE.getRelativeCaretYPosition = function() {
             y = range.startContainer.offsetTop - window.pageYOffset;
         } else {
             if (range.getClientRects) {
-                var rects = range.getClientRects();
+                var rects=range.getClientRects();
                 if (rects.length > 0) {
                     y = rects[0].top;
                 }
@@ -414,7 +421,6 @@ RE.getRelativeCaretYPosition = function() {
 
     return y;
 };
+//태그 교정 메서드 -> 포맷 적용 및 붙여넣기에서 호출 -> 마친 후 모델 업데이트 호출
 
-window.onload = function() {
-    RE.callback("ready");
-};
+

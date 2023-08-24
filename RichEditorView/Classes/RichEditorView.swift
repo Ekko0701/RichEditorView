@@ -336,9 +336,24 @@ private let DefaultInnerLineHeight: Int = 21
         runJS("RE.setJustifyRight()")
     }
     
-    public func insertImage(_ url: String, alt: String) {
-        runJS("RE.prepareInsert()")
+    public func insertImage(url: String, alt: String) {
+        runJS("RE.prepareInsert();")
         runJS("RE.insertImage('\(url.escaped)', '\(alt.escaped)')")
+    }
+    
+    public func insertImage(img: UIImage, alt: String) {
+        insertImage(data: img.uploadData(), alt: alt)
+    }
+    
+    public func insertImage(data: Data, alt: String) {
+        let base64String = data.base64EncodedString(options: Data.Base64EncodingOptions.lineLength64Characters)
+        let s = "data:image/jpeg;base64," + base64String
+        insertImage(url: s, alt: alt)
+    }
+    
+    public func insertEmoji(_ url: String, key: String) {
+        runJS("RE.prepareInsert();")
+        runJS("RE.insertEmoji('\(url.escaped)', '\(key.escaped)');")
     }
     
     public func insertLink(_ href: String, title: String) {
